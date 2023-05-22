@@ -6,12 +6,16 @@ const App: React.FC = () => {
   const iconKeys: IconKey[] = Object.keys(icons[theme]) as IconKey[];
 
   return (
-    <div className="App">
+    <div className="App" style={{ margin: '64px' }}>
+      <h1 style={{ marginBottom: '32px' }}>{`${iconKeys.length} Icons`}</h1>
       <Spritemap />
       {iconKeys.map(icon => (
-        <svg key={icon} width="20" height="20">
-          <use xlinkHref={`#icon-${icon}`} />
-        </svg>
+        <div key={icon} style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
+          <svg width="20" height="20">
+            <use xlinkHref={`#icon-${icon}`} />
+          </svg>
+          <span style={{ marginLeft: '10px' }}>{icon}</span>
+        </div>
       ))}
     </div>
   );
