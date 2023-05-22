@@ -1,55 +1,58 @@
+from bs4 import BeautifulSoup
 import os
-import xml.etree.ElementTree as ET
 
-def combine_svgs(directory):
-    combined_svg = ET.Element('svg')
-    
-    for filename in os.listdir(directory):
-        if filename.endswith('.svg'):
-            file_path = os.path.join(directory, filename)
-            svg_tree = ET.parse(file_path)
-            root = svg_tree.getroot()
-            
-            # Append the SVG root element to the combined SVG
-            combined_svg.extend(root)
-    
-    # Generate the spritemap.tsx React component
-    spritemap_content = f'''
-    import {{ FunctionComponent }} from 'react';
-    
-    export const icons = {{
-    
-        defaultTheme: {{
-            {ET.tostring(combined_svg).decode()}
-        }},
-    }};
-    '''
+def kebab_to_camel(kebab):
+    words = kebab.split('-')
+    return words[0] + ''.join(word.capitalize() for word in words[1:])
 
-    spritemap_content = spritemap_content + '''
-    export type ThemeKey = keyof typeof icons;
-    export type IconKey = keyof (typeof icons)[ThemeKey];
+endOfFile = """
+file.write('''export type ThemeKey = keyof typeof icons;
+export type IconKey = keyof (typeof icons)[ThemeKey];
 
-    export interface SpritemapProps {
-    theme?: ThemeKey;
-    }
+export interface SpritemapProps {
+theme?: ThemeKey;
+}
 
-    export const Spritemap: FunctionComponent<SpritemapProps> = ({
-    theme = 'defaultTheme',
-    }) => (
-    <svg width="0" height="0" style={{ display: 'none' }}>
-        <defs>
-        {Object.entries(icons[theme]).map(([key, value]) => (
-            <g id={`icon-${key}`} key={key} fill="currentColor">
-            {value}
-            </g>
-        ))}
-        </defs>
-    </svg>
-    );
-    '''
-    
-    with open('spritemap.tsx', 'w') as f:
-        f.write(spritemap_content)
+export const Spritemap: FunctionComponent<SpritemapProps> = ({
+theme = 'defaultTheme',
+}) => (
+<svg width="0" height="0" style={{ display: 'none' }}>
+    <defs>
+    {Object.entries(icons[theme]).map(([key, value]) => (
+        <g id={`icon-${key}`} key={key} fill="currentColor">
+        {value}
+        </g>
+    ))}
+    </defs>
+</svg>
+);"""
 
-# Call the combine_svgs function and provide the directory path where your SVG files are stored
-combine_svgs('/Users/linus/Documents/Git/candis-icons/svg')
+svg_dir = './svg'
+output_file = './spritemap.tsx'
+
+svg_files = os.listdir(svg_dir)
+
+icons = {}
+
+for svg_file in svg_files:
+    with open(os.path.join(svg_dir, svg_file), 'r') as file:
+        data = file.read()
+    soup = BeautifulSoup(data, 'xml')
+    paths = soup.find_all('path')
+    icon_name = kebab_to_camel(os.path.splitext(svg_file)[0])  # convert to camelCase
+    icons[icon_name] = [path['d'] for path in paths]
+
+with open(output_file, 'w') as file:
+    file.write("import { FunctionComponent } from 'react';\n\n")
+    file.write("export const icons = {\n  defaultTheme: {\n")
+    for icon_name, paths in icons.items():
+        file.write(f"    {icon_name}: (\n")
+        if len(paths) > 1:
+            file.write("      <>\n")
+        for path in paths:
+            file.write(f'        <path d="{path}" />\n')
+        if len(paths) > 1:
+            file.write("      </>\n")
+        file.write("    ),\n")
+    file.write("  },\n};\n")
+    file.write(endOfFile)
