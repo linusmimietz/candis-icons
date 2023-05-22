@@ -19,7 +19,7 @@ jobs:
 
             - name: Combine SVGs
               run: |
-                  pip install beautifulsoup4
+                  pip install beautifulsoup4 lxml
                   python svg_combiner.py  # or whatever you named your Python script
 
             - name: Commit and push
