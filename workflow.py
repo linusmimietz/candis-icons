@@ -6,7 +6,7 @@ def kebab_to_camel(kebab):
     return words[0] + ''.join(word.capitalize() for word in words[1:])
 
 endOfFile = """
-file.write('''export type ThemeKey = keyof typeof icons;
+export type ThemeKey = keyof typeof icons;
 export type IconKey = keyof (typeof icons)[ThemeKey];
 
 export interface SpritemapProps {
@@ -40,7 +40,7 @@ for svg_file in svg_files:
     soup = BeautifulSoup(data, 'xml')
     paths = soup.find_all('path')
     icon_name = kebab_to_camel(os.path.splitext(svg_file)[0])  # convert to camelCase
-    icons[icon_name] = [path['d'] for path in paths]
+    icons[icon_name] = [path.attrs for path in paths]  # get all attributes of each path
 
 with open(output_file, 'w') as file:
     file.write("import { FunctionComponent } from 'react';\n\n")
@@ -49,8 +49,9 @@ with open(output_file, 'w') as file:
         file.write(f"    {icon_name}: (\n")
         if len(paths) > 1:
             file.write("      <>\n")
-        for path in paths:
-            file.write(f'        <path d="{path}" />\n')
+        for path_attrs in paths:
+            attrs_str = ' '.join(f'{k}="{v}"' for k, v in path_attrs.items())
+            file.write(f'        <path {attrs_str} />\n')
         if len(paths) > 1:
             file.write("      </>\n")
         file.write("    ),\n")
