@@ -9,8 +9,10 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - uses: actions/checkout@v2
+            - name: Checkout
+              uses: actions/checkout@v2
               with:
+                  ref: ${{ github.head_ref }}
                   token: ${{ secrets.MY_PAT }}
 
             - name: Set up Python
@@ -21,7 +23,7 @@ jobs:
             - name: Combine SVGs
               run: |
                   pip install beautifulsoup4 lxml
-                  python svg_combiner.py  # or whatever you named your Python script
+                  python svg_combiner.py
 
             - name: Commit and push
               run: |
