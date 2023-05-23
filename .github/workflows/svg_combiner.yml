@@ -9,11 +9,16 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - name: Checkout
+            - name: Checkout PR branch
               uses: actions/checkout@v2
               with:
                   ref: ${{ github.head_ref }}
                   token: ${{ secrets.MY_PAT }}
+
+            - name: Checkout SVG combiner script from main branch
+              run: |
+                  git fetch origin main
+                  git checkout origin/main -- svg_combiner.py
 
             - name: Set up Python
               uses: actions/setup-python@v2
