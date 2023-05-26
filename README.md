@@ -13,3 +13,4 @@ This approach also assumes that any time a pull request is merged, it may contai
 ## ToDo
 
 -   rename path properties to camelcase
+-   add “Conventional commits” message formatting
