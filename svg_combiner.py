@@ -50,7 +50,7 @@ with open(output_file, 'w') as file:
         if len(paths) > 1:
             file.write("      <>\n")
         for path_attrs in paths:
-            attrs_str = ' '.join(f'{k}="{v}"' for k, v in path_attrs.items())
+            attrs_str = ' '.join(f'{kebab_to_camel(k)}="{v}"' for k, v in path_attrs.items())
             file.write(f'        <path {attrs_str} />\n')
         if len(paths) > 1:
             file.write("      </>\n")
