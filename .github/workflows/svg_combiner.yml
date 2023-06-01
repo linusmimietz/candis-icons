@@ -7,13 +7,14 @@ on:
 jobs:
     combine:
         runs-on: ubuntu-latest
+        if: github.actor != 'Candis Bot' # change 'Candis Bot' to the actual GitHub username of the bot
 
         steps:
             - name: Checkout PR branch
               uses: actions/checkout@v2
               with:
                   ref: ${{ github.head_ref }}
-                  fetch-depth: 0
+                  fetch-depth: 0 # ensure all history is fetched
                   token: ${{ secrets.MY_PAT }}
 
             - name: Checkout SVG combiner script from main branch
