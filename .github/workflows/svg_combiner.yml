@@ -36,9 +36,11 @@ jobs:
                   git config --local user.email "devtools+candisbot@candis.io"
                   git config --local user.name "Candis Bot"
                   git add spritemap.tsx
+                  git checkout -b "${{ github.head_ref }}-squashed"
                   if git diff-index --quiet HEAD --; then
                       git commit --allow-empty -m "No changes to commit"
                   else
                       git reset $(git commit-tree HEAD^{tree} -m "feat(icons): Updating icon set")
                   fi
-                  git push origin +${{ github.head_ref }}
+                  git push origin "${{ github.head_ref }}-squashed"
+                  gh pr edit ${{ github.event.pull_request.number }} --base "${{ github.head_ref }}-squashed" --repo ${{ github.repository }}
