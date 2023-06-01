@@ -13,7 +13,7 @@ jobs:
               uses: actions/checkout@v2
               with:
                   ref: ${{ github.head_ref }}
-                  fetch-depth: 0 # ensure all history is fetched
+                  token: ${{ secrets.MY_PAT }}
 
             - name: Checkout SVG combiner script from main branch
               run: |
@@ -30,14 +30,10 @@ jobs:
                   pip install beautifulsoup4 lxml
                   python svg_combiner.py
 
-            - name: Squash commits, commit and push
+            - name: Commit and push
               run: |
                   git config --local user.email "devtools+candisbot@candis.io"
                   git config --local user.name "Candis Bot"
-                  git checkout -b temp_branch
-                  git add .
-                  git commit -m "WIP"
-                  git checkout ${{ github.head_ref }}
-                  git reset --soft temp_branch
-                  git status --porcelain | grep '^ M' && git commit -m "feat(icons): Updating icon set" || git commit -m "No changes to commit"
-                  git push origin ${{ github.head_ref }}
+                  git add spritemap.tsx
+                  git commit -m "feat(icons): Updating icon set" -a || echo "No changes to commit"
+                  git push
