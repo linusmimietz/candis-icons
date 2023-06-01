@@ -7,7 +7,7 @@ on:
 jobs:
     combine:
         runs-on: ubuntu-latest
-        if: github.actor != 'Candis Bot' # change 'Candis Bot' to the actual GitHub username of the bot
+        if: github.actor != 'Candis Bot' && github.actor != 'candis-bot'
 
         steps:
             - name: Checkout PR branch
