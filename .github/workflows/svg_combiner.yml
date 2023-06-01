@@ -32,6 +32,8 @@ jobs:
                   python svg_combiner.py
 
             - name: Squash commits and push
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
                   git config --local user.email "devtools+candisbot@candis.io"
                   git config --local user.name "Candis Bot"
