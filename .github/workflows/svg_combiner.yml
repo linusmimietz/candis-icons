@@ -1,0 +1,44 @@
+name: SVG Combiner
+
+on:
+    pull_request:
+        types: [opened, synchronize]
+
+jobs:
+    combine:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout PR branch
+              uses: actions/checkout@v2
+              with:
+                  ref: ${{ github.head_ref }}
+                  token: ${{ secrets.MY_PAT }}
+                  fetch-depth: 0
+
+            - name: Checkout SVG combiner script from main branch
+              run: |
+                  git fetch origin main
+                  git checkout origin/main -- svg_combiner.py
+
+            - name: Set up Python
+              uses: actions/setup-python@v2
+              with:
+                  python-version: 3.8
+
+            - name: Combine SVGs
+              run: |
+                  pip install beautifulsoup4 lxml
+                  python svg_combiner.py
+
+            - name: Squash commits and push
+              run: |
+                  git config --local user.email "devtools+candisbot@candis.io"
+                  git config --local user.name "Candis Bot"
+                  git add spritemap.tsx
+                  if git diff-index --quiet HEAD --; then
+                      git commit --allow-empty -m "No changes to commit"
+                  else
+                      git reset $(git commit-tree HEAD^{tree} -m "feat(icons): Updating icon set")
+                  fi
+                  git push origin +${{ github.head_ref }}
