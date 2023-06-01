@@ -39,8 +39,9 @@ jobs:
                   FILE_CHANGE_COUNT=$(git diff --name-only HEAD~1 | wc -l)
                   if [ $FILE_CHANGE_COUNT -gt 0 ]
                   then
+                      GIT_SEQUENCE_EDITOR="sed -i -re 's/^pick (\\w+) .*/pick \\1/g'" git rebase -i $(git rev-list --max-parents=0 HEAD)
                       git commit --amend -m "feat(icons): Updating icon set"
-                      git push origin +${{ github.head_ref }} # Force pushes the combined commit
+                      git push origin +${{ github.head_ref }}
                   else
                       echo "No changes to commit"
                   fi
