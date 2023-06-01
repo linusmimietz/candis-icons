@@ -30,10 +30,9 @@ jobs:
                   pip install beautifulsoup4 lxml
                   python svg_combiner.py
 
-            - name: Commit and push
+            - name: Squash commits
               run: |
-                  git config --local user.email "devtools+candisbot@candis.io"
-                  git config --local user.name "Candis Bot"
-                  git add spritemap.tsx
-                  git commit -m "feat(icons): Updating icon set" -a || echo "No changes to commit"
-                  git push
+                  git reset $(git merge-base HEAD ${{ github.base_ref }})
+                  git add .
+                  git commit -m "feat(icons): Updating icon set" || echo "No changes to commit"
+                  git push --force-with-lease origin ${{ github.head_ref }}
