@@ -35,5 +35,8 @@ jobs:
                   git config --local user.email "devtools+candisbot@candis.io"
                   git config --local user.name "Candis Bot"
                   git add spritemap.tsx
-                  git commit -m "feat(icons): Updating icon set" -a || echo "No changes to commit"
-                  git push
+                  commit_status=$(git commit -m "feat(icons): Updating icon set" -a || echo "No changes to commit")
+                  if [[ $commit_status != *"No changes to commit"* ]]; then
+                    git pull --rebase=interactive origin $(echo ${{ github.base_ref }}) --autosquash --committer-date-is-author-date
+                  fi
+                  git push origin HEAD:$(echo ${{ github.head_ref }})
